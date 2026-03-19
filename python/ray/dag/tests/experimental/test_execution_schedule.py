@@ -193,8 +193,12 @@ class TestSelectNextNodes:
         )
         set_sync_idxs_p2p(mock_graph, task_idx_1, task_idx_2)
         mock_actor_to_candidates = {
-            fake_actor_1._actor_id: [mock_graph[task_idx_1][_DAGNodeOperationType.WRITE]],
-            fake_actor_2._actor_id: [mock_graph[task_idx_2][_DAGNodeOperationType.READ]],
+            fake_actor_1._actor_id: [
+                mock_graph[task_idx_1][_DAGNodeOperationType.WRITE]
+            ],
+            fake_actor_2._actor_id: [
+                mock_graph[task_idx_2][_DAGNodeOperationType.READ]
+            ],
         }
         next_nodes = _select_next_nodes(mock_actor_to_candidates, mock_graph)
         assert next_nodes == [
