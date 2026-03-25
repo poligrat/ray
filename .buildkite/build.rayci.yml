@@ -22,6 +22,52 @@ steps:
       - oss
       - skip-on-premerge
 
+  # TODO(andrewpollack): Temporary step to verify wanda digest output matches
+  # the cache tag used by ray-core-build. Remove after verification.
+  - label: ":mag: verify: ray-core wanda digest py{{matrix}} (x86_64)"
+    key: ray_core_digest_verify
+    instance_type: small
+    commands:
+      - echo "--- rayci mode (should match ray-core-build cache tag)"
+      - PYTHON_VERSION="{{matrix}}" ARCH_SUFFIX="" HOSTTYPE="x86_64"
+        bazel run //ci/build:wanda_digest -- ci/docker/ray-core.wanda.yaml --rayci
+      - echo "--- epoch=0 (stable digest for cache lookup)"
+      - PYTHON_VERSION="{{matrix}}" ARCH_SUFFIX="" HOSTTYPE="x86_64"
+        bazel run //ci/build:wanda_digest -- ci/docker/ray-core.wanda.yaml --epoch=0
+    matrix:
+      - "3.12"
+    depends_on:
+      - ray-core-build
+      - forge
+    tags:
+      - release_wheels
+      - always
+
+  # TODO(andrewpollack): Uncomment after verifying digest output above.
+  # TODO(andrewpollack): Uncomment after verifying digest output above.
+  # - label: ":arrow_up: publish: ray-core digest py{{matrix}} (x86_64)"
+  #   key: ray_core_digest_publish
+  #   instance_type: small
+  #   commands:
+  #     - |
+  #       PYTHON_VERSION="{{matrix}}" ARCH_SUFFIX="" HOSTTYPE="x86_64" \
+  #       DIGEST=$$(bazel run //ci/build:wanda_digest -- ci/docker/ray-core.wanda.yaml --epoch=0)
+  #       CACHE_TAG="$${RAYCI_WORK_REPO}:$${RAYCI_BUILD_ID}-ray-core-py{{matrix}}"
+  #       echo "$$CACHE_TAG" > /tmp/ray-core-digest
+  #       bazel run .buildkite:copy_files -- --destination ray-core --key "core-digest/linux/x86_64/{{matrix}}/$$DIGEST" --path /tmp/ray-core-digest
+  #   matrix:
+  #     - "3.10"
+  #     - "3.11"
+  #     - "3.12"
+  #     - "3.13"
+  #     - "3.14"
+  #   depends_on:
+  #     - ray-core-build
+  #     - forge
+  #   tags:
+  #     - release_wheels
+  #     - skip-on-premerge
+
   - name: ray-cpp-core-build
     label: "wanda: cpp core (x86_64)"
     wanda: ci/docker/ray-cpp-core.wanda.yaml
