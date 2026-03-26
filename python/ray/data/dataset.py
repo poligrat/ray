@@ -1815,7 +1815,7 @@ class Dataset:
     def random_shuffle(
         self,
         *,
-        seed: Optional[int | RandomSeedConfig] = None,
+        seed: Optional[Union[int, RandomSeedConfig]] = None,
         num_blocks: Optional[int] = None,
         **ray_remote_args,
     ) -> "Dataset":
@@ -1897,7 +1897,7 @@ class Dataset:
     def randomize_block_order(
         self,
         *,
-        seed: Optional[int | RandomSeedConfig] = None,
+        seed: Optional[Union[int, RandomSeedConfig]] = None,
     ) -> "Dataset":
         """Randomly shuffle the :ref:`blocks <dataset_concept>` of this :class:`Dataset`.
 
@@ -1947,7 +1947,7 @@ class Dataset:
 
     @PublicAPI(api_group=BT_API_GROUP)
     def random_sample(
-        self, fraction: float, *, seed: Optional[int | RandomSeedConfig] = None
+        self, fraction: float, *, seed: Optional[Union[int, RandomSeedConfig]] = None
     ) -> "Dataset":
         """Returns a new :class:`Dataset` containing a random fraction of the rows.
         In other words, this method "randomly filters" the rows of the dataset without
