@@ -346,7 +346,7 @@ class PandasBlockBuilder(TableBlockBuilder):
         return BlockType.PANDAS
 
 
-# NOTE: This has to be compatible with Pyarrow ``Schema``
+# NOTE: This has to be compatible with pyarrow.lib.schema
 @dataclass(frozen=True, init=False)
 class PandasBlockSchema:
     # Stored as tuples for hash-ability.

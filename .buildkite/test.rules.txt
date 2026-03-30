@@ -186,7 +186,6 @@ site/
 ;
 
 ci/lint/
-.buildkite/cicd.rayci.yml
 .buildkite/lint.rayci.yml
 .buildkite/bisect/
 ci/fossa/

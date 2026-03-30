@@ -37,8 +37,10 @@ class PlacementGroupCleanerCallback(ControllerCallback, WorkerGroupCallback):
         self._controller_actor_id: Optional[str] = None
 
     def after_controller_start(self, train_run_context: "TrainRunContext"):
-        """Launch the detached PlacementGroupCleaner actor and start monitoring."""
+        """Launch the detached PlacementGroupCleaner actor.
 
+        This is called when the controller starts, before the control loop begins.
+        """
         core_context = ray.runtime_context.get_runtime_context()
         self._controller_actor_id = core_context.get_actor_id()
         try:
@@ -47,10 +49,7 @@ class PlacementGroupCleanerCallback(ControllerCallback, WorkerGroupCallback):
             self._cleaner = cleaner_actor_cls.options(
                 lifetime="detached",
                 get_if_exists=False,
-            ).remote(
-                controller_actor_id=self._controller_actor_id,
-                check_interval_s=self._check_interval_s,
-            )
+            ).remote(check_interval_s=self._check_interval_s)
 
             logger.debug(
                 f"PlacementGroupCleaner launched for run_id={train_run_context.run_id}"
@@ -61,9 +60,6 @@ class PlacementGroupCleanerCallback(ControllerCallback, WorkerGroupCallback):
                 "Placement groups may not be cleaned up if controller exits ungracefully."
             )
             self._cleaner = None
-            return
-
-        self._cleaner.start_monitoring.remote()
 
     def after_worker_group_start(self, worker_group: "WorkerGroup"):
         """Register the worker group's placement group with the cleaner.
@@ -80,7 +76,11 @@ class PlacementGroupCleanerCallback(ControllerCallback, WorkerGroupCallback):
         placement_group = worker_group_state.placement_group_handle.placement_group
 
         try:
-            ray.get(self._cleaner.register_placement_group.remote(placement_group))
+            ray.get(
+                self._cleaner.register_controller_and_placement_group.remote(
+                    self._controller_actor_id, placement_group
+                )
+            )
         except Exception as e:
             logger.warning(
                 f"Failed to register placement group with cleaner: {e}. "
@@ -88,14 +88,13 @@ class PlacementGroupCleanerCallback(ControllerCallback, WorkerGroupCallback):
             )
             return
 
+        self._cleaner.start_monitoring.remote()
+
         logger.debug(
             f"Registered placement group {placement_group.id} with PlacementGroupCleaner."
         )
 
     async def before_controller_shutdown(self):
-        self._stop_cleaner()
-
-    def before_controller_abort(self):
         self._stop_cleaner()
 
     def _stop_cleaner(self):

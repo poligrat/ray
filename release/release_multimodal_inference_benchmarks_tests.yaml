@@ -19,7 +19,6 @@
 
   variations:
     - __suffix__: ray
-      frequency: nightly
       run:
         script: python image_classification/ray_data_main.py
 
@@ -40,7 +39,6 @@
 
   variations:
     - __suffix__: ray
-      frequency: nightly
       run:
         script: python large_image_embedding/ray_data_main.py
 
@@ -61,7 +59,6 @@
 
   variations:
   - __suffix__: ray
-    frequency: nightly
     run:
       script: python document_embedding/ray_data_main.py
 
@@ -84,7 +81,6 @@
 
   variations:
     - __suffix__: ray
-      frequency: nightly
       run:
         script: python audio_transcription/ray_data_main.py
 
@@ -104,7 +100,6 @@
 
   variations:
     - __suffix__: ray
-      frequency: nightly
       run:
         script: python video_object_detection/ray_data_main.py
 

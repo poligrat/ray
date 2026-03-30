@@ -316,8 +316,7 @@ class AutoscalerStateServiceHandler {
 
   virtual void HandleDrainNode(DrainNodeRequest request,
                                DrainNodeReply *reply,
-                               SendReplyCallback send_reply_callback,
-                               const std::string &grpc_peer) = 0;
+                               SendReplyCallback send_reply_callback) = 0;
 
   virtual void HandleResizeRayletResourceInstances(
       ResizeRayletResourceInstancesRequest request,

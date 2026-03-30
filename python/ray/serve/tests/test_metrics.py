@@ -1285,11 +1285,11 @@ def test_routing_stats_delay_metric(metrics_start_shutdown):
         )
         if not metrics:
             return False
-        # Check that at least one metric has expected tags (no per-replica label)
+        # Check that at least one metric has expected tags
         for metric in metrics:
             assert metric["deployment"] == "Model"
             assert metric["application"] == "app"
-            assert "replica" not in metric
+            assert "replica" in metric
             return True
         return False
 
